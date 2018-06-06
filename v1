@@ -1,0 +1,89 @@
+FROM amazonlinux:1
+
+MAINTAINER Pablo Carballo v3
+
+# RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
+
+# Instalando apache, php y librerias necesarias
+RUN yum update -y && \
+    yum upgrade -y
+
+RUN yum install -y \
+    sudo \
+    httpd24 \
+    mod24_ssl \
+    gcc \
+    memcached \
+    openssl-devel \
+    php70 \
+    php70-bcmath \
+    php70-cli \
+    php70-common \
+    php70-dba \
+    php70-dbg \
+    php70-devel \
+    php70-enchant \
+    php70-fpm \
+    php70-gd \
+    php70-gmp \
+    php70-imap \
+    php70-intl \
+    php70-json \
+    php70-ldap \
+    php70-mbstring \
+    php70-mcrypt \
+    php70-mysqlnd \
+    php70-odbc \
+    php70-opcache \
+    php70-pdo \
+    php70-pdo-dblib \
+    php70-pecl-igbinary \
+    php70-pecl-imagick \
+    php70-pecl-memcached \
+    php70-pecl-oauth \
+    php70-pecl-ssh2 \
+    php70-pecl-uuid \
+    php70-pecl-yaml \
+    php70-pgsql \
+    php70-process \
+    php70-pspell \
+    php70-recode \
+    php70-snmp \
+    php70-soap \
+    php70-tidy \
+    php70-xml \
+    php70-xmlrpc \
+    php70-zip \
+    php7-pear \
+    man \
+    && yum clean all
+
+# Intalando mas utils
+RUN yum install -y curl && \
+    yum install -y nano
+
+# Linkamos el public a /var/www/html
+ENV APP_HOME /var/www/html
+RUN mkdir -p /web/deploy/public && \
+    ln -s /web/deploy/public $APP_HOME 
+
+# Intalamos laravel
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer && \
+    ln -s /usr/local/bin/composer /usr/bin/composer && \
+    composer global require "laravel/installer"
+
+# Actualizamos default apache con lo creado
+ADD ami-httpd.conf /etc/httpd/conf/httpd.conf
+
+# Exponiendo puertos apache
+EXPOSE 80
+
+# Updateamos composer, generamos key para larval y damos permisos a las carpetas cache de escritura (todo después de q se levante el contenedor, sino pitaría al no existir las carpetas)
+ONBUILD RUN cd /web/deploy/ && \
+            composer update && \
+            # php artisan key:generate && \
+            chmod -R 777 /web/deploy/storage /web/deploy/bootstrap
+
+# Reiniciamos apache2
+CMD ["/usr/sbin/httpd","-D","FOREGROUND"]
+
