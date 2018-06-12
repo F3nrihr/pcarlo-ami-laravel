@@ -1,6 +1,6 @@
 FROM amazonlinux:1
 
-MAINTAINER Pablo Carballo v3
+MAINTAINER Pablo Carballo
 
 # RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 
