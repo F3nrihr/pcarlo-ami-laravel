@@ -70,7 +70,8 @@ RUN mkdir -p /web/deploy/public && \
 # Intalamos laravel
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer && \
     ln -s /usr/local/bin/composer /usr/bin/composer && \
-    composer global require "laravel/installer"
+    composer global require "laravel/installer" && \
+    sed -i 's/short_open_tag = Off/short_open_tag = On/g' /etc/php-7.0.ini
 
 # Actualizamos default apache con lo creado
 ADD ami-httpd.conf /etc/httpd/conf/httpd.conf
