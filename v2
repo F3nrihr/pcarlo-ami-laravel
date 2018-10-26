@@ -54,6 +54,8 @@ RUN yum install -y \
     man \
     && yum clean all
 
+RUN yum install -y libfontconfig1 fontconfig libfontconfig1-dev libfreetype6-dev
+
 # Intalando mas utils
 RUN yum install -y curl  \
     vim \
