@@ -66,6 +66,12 @@ ENV APP_HOME /var/www/html
 RUN mkdir -p /web/deploy/public && \
     ln -s /web/deploy/public $APP_HOME 
 
+# Intalamos node y npm
+RUN curl --silent --location https://rpm.nodesource.com/setup_10.x | sudo bash - && \
+    yum clean all  && \
+    yum install nodejs nodejs-devel nodejs-docs --enablerepo=nodesource
+
+
 # Intalamos laravel
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer && \
     ln -s /usr/local/bin/composer /usr/bin/composer && \
@@ -79,7 +85,7 @@ ADD ami-httpd.conf /etc/httpd/conf/httpd.conf
 # Exponiendo puertos apache
 EXPOSE 80
 
-# Updateamos composer, generamos key para larval y damos permisos a las carpetas cache de escritura (todo después de q se levante el contenedor, sino pitaría al no existir las carpetas)
+# Updateamos composer, generamos key para laravel y damos permisos a las carpetas cache de escritura (todo después de q se levante el contenedor, sino pitaría al no existir las carpetas)
 ONBUILD RUN cd /web/deploy/ && \
             composer update && \
             # php artisan key:generate && \
@@ -87,4 +93,3 @@ ONBUILD RUN cd /web/deploy/ && \
 
 # Reiniciamos apache2
 CMD ["/usr/sbin/httpd","-D","FOREGROUND"]
-
