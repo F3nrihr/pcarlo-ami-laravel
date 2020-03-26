@@ -5,7 +5,7 @@ v1 -> PHP 7.0
 
 v2 -> PHP 7.1
 
-Descarga ami-httpd.comf
+Descarga ami-httpd.conf
 
 Levanta el contenedor desde donde se encuentre este archivo.
 
